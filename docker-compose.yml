@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  jupyter_lab:
+    build: .
+    image: gro_jupyter_lab
+    container_name: jupyter_lab
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./developement:/developement
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: "always"
+    networks:
+      - tf_gro_net
+
+  gromacs:
+    image: gromacs/gromacs:latest
+    container_name: gromacs_lab
+    ports:
+      - "9999:9999"
+    volumes:
+      - ./developement:/developement
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: ["gmx", "pdb2gmx", "--version"]
+    restart: "always"
+    networks:
+      - tf_gro_net
+
+networks:
+  tf_gro_net:
+    driver: bridge
